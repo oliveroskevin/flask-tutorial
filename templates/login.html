@@ -1,0 +1,29 @@
+{% extends 'base.html' %} {% block head %}
+<title>Login</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}" />
+{% endblock %} {% block body %}
+<div class="login-container">
+    <div class="left-panel">
+        <div class="left-panel-content">
+            <div class="logo">Emapta</div>
+            <h1>Document Management System</h1>
+        </div>
+    </div>
+    <div class="right-panel">
+        <div class="right-panel-content">
+            <div class="login-form">
+                <h2>Welcome!</h2>
+                <p>Log in to get started</p>
+                <a href="/login-page" class="login-button">Log in</a>
+                <div class="help-text">
+                    Having problems? Email us at <a href="mailto:helpme@emapta.com">helpme@emapta.com</a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-links">
+            <a href="#">Terms of use</a>
+            <a href="#">Privacy policy</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

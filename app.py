@@ -14,6 +14,7 @@ class Todo(db.Model):
 
     def __repr__(self):
         return '<Task %r>' % self.id
+    
 
 @app.route('/', methods=['POST', 'GET'])
 def index():
@@ -53,6 +54,14 @@ def update(id):
             return 'There was an issue updating your task'
     else:
         return render_template('update.html', task=task)
+    
+@app.route('/login')
+def login():
+    return render_template('login.html')
+
+@app.route('/login-page')
+def login_page():
+    return render_template('login-page.html')
 
 if __name__ == "__main__":
     app.run(debug=True)
