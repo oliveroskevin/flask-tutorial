@@ -38,6 +38,7 @@
                 <div class="header-item size">Size <i class="fas fa-arrow-down"></i></div>
                 <div class="header-item date-uploaded">Date Uploaded <i class="fas fa-arrow-down"></i></div>
                 <div class="header-item date-modified">Date Modified <i class="fas fa-arrow-down"></i></div>
+                <div class="header-item actions"></div>
             </div>
             {% if not documents %}
             <div class="empty-list">
@@ -47,7 +48,7 @@
                 <button class="add-new-secondary-btn"><i class="fas fa-plus"></i> Add new</button>
             </div>
             {% else %} {% for doc in documents %}
-            <div class="list-item">
+            <div class="list-item" data-id="{{ doc.id }}" data-name="{{ doc.name }}">
                 <div class="item-cell name">
                     {% if doc.type == 'Folder' %}
                     <i class="fas fa-folder"></i>
@@ -70,6 +71,13 @@
                     <span class="modifier">Maria Clara</span>
                     {% else %} Not available {% endif %}
                 </div>
+                <div class="item-cell actions">
+                    <i class="fas fa-ellipsis-v action-btn"></i>
+                    <div class="action-popup">
+                        <a href="#" class="edit-btn">Edit</a>
+                        <a href="#" class="delete-btn">Delete</a>
+                    </div>
+                </div>
             </div>
             {% endfor %} {% endif %}
         </div>
@@ -91,6 +99,21 @@
     </main>
 </div>
 
+<div id="edit-modal" class="modal">
+    <div class="modal-content">
+        <span class="close-btn">&times;</span>
+        <h2>Edit Document Name</h2>
+        <form id="edit-form">
+            <input type="hidden" id="edit-doc-id" name="id" />
+            <div class="form-group">
+                <label for="edit-doc-name">Document Name</label>
+                <input type="text" id="edit-doc-name" name="name" required />
+            </div>
+            <button type="submit" class="save-btn">Save Changes</button>
+        </form>
+    </div>
+</div>
+
 <div id="upload-modal" class="modal">
     <div class="modal-content">
         <span class="close-btn">&times;</span>
@@ -105,52 +128,59 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', () => {
-        const modal = document.getElementById('upload-modal');
-        const closeBtn = document.querySelector('.modal .close-btn');
-        const uploadForm = document.getElementById('upload-form');
-        const fileInput = document.getElementById('file-input');
+        const uploadModal = document.getElementById('upload-modal');
+        const editModal = document.getElementById('edit-modal');
+        const modals = document.querySelectorAll('.modal');
 
-        const openModal = () => {
-            modal.style.display = 'block';
+        const openModal = (modal) => {
+            if (modal) modal.style.display = 'block';
         };
 
-        const closeModal = () => {
-            modal.style.display = 'none';
-            uploadForm.reset();
+        const closeModal = (modal) => {
+            if (modal) {
+                modal.style.display = 'none';
+                const form = modal.querySelector('form');
+                if (form) form.reset();
+            }
         };
 
-        document.querySelectorAll('.add-new-btn, .add-new-secondary-btn').forEach((btn) => {
-            btn.addEventListener('click', openModal);
+        // General modal close functionality
+        modals.forEach((modal) => {
+            const closeBtn = modal.querySelector('.close-btn');
+            closeBtn.addEventListener('click', () => closeModal(modal));
         });
-
-        closeBtn.addEventListener('click', closeModal);
 
         window.addEventListener('click', (event) => {
-            if (event.target == modal) {
-                closeModal();
-            }
+            modals.forEach((modal) => {
+                if (event.target == modal) {
+                    closeModal(modal);
+                }
+            });
         });
 
+        // Upload modal functionality
+        document.querySelectorAll('.add-new-btn, .add-new-secondary-btn').forEach((btn) => {
+            btn.addEventListener('click', () => openModal(uploadModal));
+        });
+
+        const uploadForm = document.getElementById('upload-form');
+        const fileInput = document.getElementById('file-input');
         uploadForm.addEventListener('submit', async (event) => {
             event.preventDefault();
-
             const file = fileInput.files[0];
             if (!file) {
                 alert('Please select a file.');
                 return;
             }
-
             const formData = new FormData();
             formData.append('name', file.name);
             formData.append('size', file.size);
             formData.append('type', file.type || 'unknown');
-
             try {
                 const response = await fetch('/documents', {
                     method: 'POST',
                     body: formData,
                 });
-
                 if (response.ok) {
                     window.location.href = '/documents';
                 } else {
@@ -160,6 +190,96 @@
                 console.error('Error:', error);
                 alert('An error occurred while adding the document.');
             }
+        });
+
+        // Action popup functionality
+        document.querySelectorAll('.action-btn').forEach((btn) => {
+            btn.addEventListener('click', (event) => {
+                event.stopPropagation();
+                // Close all other popups
+                document.querySelectorAll('.action-popup').forEach((popup) => {
+                    if (popup !== btn.nextElementSibling) {
+                        popup.classList.remove('show');
+                    }
+                });
+                // Toggle current popup
+                const popup = btn.nextElementSibling;
+                popup.classList.toggle('show');
+            });
+        });
+
+        window.addEventListener('click', () => {
+            document.querySelectorAll('.action-popup').forEach((popup) => {
+                popup.classList.remove('show');
+            });
+        });
+
+        // Edit functionality
+        const editForm = document.getElementById('edit-form');
+        const editDocIdInput = document.getElementById('edit-doc-id');
+        const editDocNameInput = document.getElementById('edit-doc-name');
+
+        document.querySelectorAll('.edit-btn').forEach((btn) => {
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                const listItem = btn.closest('.list-item');
+                const docId = listItem.dataset.id;
+                const docName = listItem.dataset.name;
+
+                editDocIdInput.value = docId;
+                editDocNameInput.value = docName;
+                openModal(editModal);
+            });
+        });
+
+        editForm.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const docId = editDocIdInput.value;
+            const newName = editDocNameInput.value;
+
+            try {
+                const response = await fetch(`/documents/edit/${docId}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name: newName }),
+                });
+
+                if (response.ok) {
+                    window.location.href = '/documents';
+                } else {
+                    alert('There was an issue updating the document name.');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('An error occurred while updating the document name.');
+            }
+        });
+
+        // Delete functionality
+        document.querySelectorAll('.delete-btn').forEach((btn) => {
+            btn.addEventListener('click', async (e) => {
+                e.preventDefault();
+                if (confirm('Are you sure you want to delete this document?')) {
+                    const listItem = btn.closest('.list-item');
+                    const docId = listItem.dataset.id;
+
+                    try {
+                        const response = await fetch(`/documents/delete/${docId}`, {
+                            method: 'DELETE',
+                        });
+
+                        if (response.ok) {
+                            listItem.remove();
+                            // Optionally, update the total item count display
+                        } else {
+                            alert('There was an issue deleting the document.');
+                        }
+                    } catch (error) {
+                        console.error('Error:', error);
+                        alert('An error occurred while deleting the document.');
+                    }
+                }
+            });
         });
     });
 </script>

@@ -62,5 +62,34 @@ def documents():
         documents = Document.query.order_by(Document.date_uploaded.desc()).all()
         return render_template('document-list.html', documents=documents)
 
+@app.route('/documents/edit/<int:id>', methods=['POST'])
+def edit_document(id):
+    doc_to_edit = Document.query.get_or_404(id)
+    data = request.get_json()
+    new_name = data.get('name')
+
+    if not new_name:
+        return 'New name is required', 400
+
+    doc_to_edit.name = new_name
+    doc_to_edit.date_modified = datetime.now(timezone.utc)
+    try:
+        db.session.commit()
+        return 'Document updated successfully', 200
+    except Exception as e:
+        db.session.rollback()
+        return f'There was an issue updating the document: {e}', 500
+
+@app.route('/documents/delete/<int:id>', methods=['DELETE'])
+def delete_document(id):
+    doc_to_delete = Document.query.get_or_404(id)
+    try:
+        db.session.delete(doc_to_delete)
+        db.session.commit()
+        return 'Document deleted successfully', 200
+    except Exception as e:
+        db.session.rollback()
+        return f'There was a problem deleting that document: {e}', 500
+
 if __name__ == "__main__":
     app.run(debug=True)
