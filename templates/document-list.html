@@ -1,0 +1,166 @@
+{% extends 'base.html' %} {% block head %}
+<title>Document Management</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/document-list.css') }}" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+{% endblock %} {% block body %}
+<div class="container">
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <div class="logo">E</div>
+        </div>
+        <nav class="sidebar-nav">
+            <ul>
+                <li>
+                    <a href="#" class="active"><i class="fas fa-home"></i></a>
+                </li>
+                <li>
+                    <a href="#"><i class="fas fa-folder"></i></a>
+                </li>
+            </ul>
+        </nav>
+    </aside>
+    <main class="main-content">
+        <header class="main-header">
+            <h1>Document Management</h1>
+            <div class="user-profile">AA</div>
+        </header>
+        <div class="toolbar">
+            <div class="search-container">
+                <i class="fas fa-search"></i>
+                <input type="text" placeholder="Search for a file or folder" />
+            </div>
+            <button class="add-new-btn"><i class="fas fa-plus"></i> Add new</button>
+        </div>
+        <div class="document-list">
+            <div class="list-header">
+                <div class="header-item name">Name <i class="fas fa-arrow-down"></i></div>
+                <div class="header-item type">Type</div>
+                <div class="header-item size">Size <i class="fas fa-arrow-down"></i></div>
+                <div class="header-item date-uploaded">Date Uploaded <i class="fas fa-arrow-down"></i></div>
+                <div class="header-item date-modified">Date Modified <i class="fas fa-arrow-down"></i></div>
+            </div>
+            {% if not documents %}
+            <div class="empty-list">
+                <div class="empty-list-icon"></div>
+                <h2>No documents found</h2>
+                <p>Parsed documents will be displayed here</p>
+                <button class="add-new-secondary-btn"><i class="fas fa-plus"></i> Add new</button>
+            </div>
+            {% else %} {% for doc in documents %}
+            <div class="list-item">
+                <div class="item-cell name">
+                    {% if doc.type == 'Folder' %}
+                    <i class="fas fa-folder"></i>
+                    {% else %}
+                    <i class="fas fa-file-alt"></i>
+                    {% endif %}
+                    <span>{{ doc.name }}</span>
+                </div>
+                <div class="item-cell type">
+                    {% if doc.type == 'Folder' %} Folder {% elif 'wordprocessingml' in doc.type %} DOCX {% else %} {{
+                    doc.type.split('/')[-1] | upper if '/' in doc.type else doc.type | upper }} {% endif %}
+                </div>
+                <div class="item-cell size">{{ "%.2f" | format(doc.size / (1024*1024)) }} MB</div>
+                <div class="item-cell date-uploaded">
+                    {{ doc.date_uploaded.strftime('%a, %d %b %Y %H:%M:%S') }}
+                    <span class="modifier">Juan dela Cruz</span>
+                </div>
+                <div class="item-cell date-modified">
+                    {% if doc.date_modified %} {{ doc.date_modified.strftime('%a, %d %b %Y %H:%M:%S') }}
+                    <span class="modifier">Maria Clara</span>
+                    {% else %} Not available {% endif %}
+                </div>
+            </div>
+            {% endfor %} {% endif %}
+        </div>
+        <footer class="main-footer">
+            <div class="pagination">
+                <button disabled>&lt;</button>
+                <button class="active">1</button>
+                <button>&gt;</button>
+            </div>
+            <div class="page-size-selector">
+                <select>
+                    <option>10 / page</option>
+                </select>
+            </div>
+            <div class="item-count">
+                1-{{ documents|length if documents else 0 }} of {{ documents|length if documents else 0 }} items
+            </div>
+        </footer>
+    </main>
+</div>
+
+<div id="upload-modal" class="modal">
+    <div class="modal-content">
+        <span class="close-btn">&times;</span>
+        <h2>Add new document</h2>
+        <form id="upload-form">
+            <p>Select a file to get its details.</p>
+            <input type="file" id="file-input" required />
+            <button type="submit" class="upload-btn">Add Document</button>
+        </form>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const modal = document.getElementById('upload-modal');
+        const closeBtn = document.querySelector('.modal .close-btn');
+        const uploadForm = document.getElementById('upload-form');
+        const fileInput = document.getElementById('file-input');
+
+        const openModal = () => {
+            modal.style.display = 'block';
+        };
+
+        const closeModal = () => {
+            modal.style.display = 'none';
+            uploadForm.reset();
+        };
+
+        document.querySelectorAll('.add-new-btn, .add-new-secondary-btn').forEach((btn) => {
+            btn.addEventListener('click', openModal);
+        });
+
+        closeBtn.addEventListener('click', closeModal);
+
+        window.addEventListener('click', (event) => {
+            if (event.target == modal) {
+                closeModal();
+            }
+        });
+
+        uploadForm.addEventListener('submit', async (event) => {
+            event.preventDefault();
+
+            const file = fileInput.files[0];
+            if (!file) {
+                alert('Please select a file.');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('name', file.name);
+            formData.append('size', file.size);
+            formData.append('type', file.type || 'unknown');
+
+            try {
+                const response = await fetch('/documents', {
+                    method: 'POST',
+                    body: formData,
+                });
+
+                if (response.ok) {
+                    window.location.href = '/documents';
+                } else {
+                    alert('There was an issue adding your document.');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('An error occurred while adding the document.');
+            }
+        });
+    });
+</script>
+{% endblock %}
