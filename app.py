@@ -32,6 +32,10 @@ class Document(db.Model):
 def login():
     return render_template('login.html')
 
+@app.route('/prototypes')
+def prototypes():
+    return render_template('prototypes.html')
+
 @app.route('/login-page')
 def login_page():
     return render_template('login-page.html')
@@ -60,7 +64,7 @@ def documents():
             return f'There was an issue adding your document: {e}', 500
     else:
         documents = Document.query.order_by(Document.date_uploaded.desc()).all()
-        return render_template('document-list.html', documents=documents)
+        return render_template('documents.html', documents=documents)
 
 @app.route('/documents/edit/<int:id>', methods=['POST'])
 def edit_document(id):
