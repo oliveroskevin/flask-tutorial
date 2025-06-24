@@ -1,12 +1,12 @@
 from flask import Flask, render_template
 from models.db import db
-from routes.document_management import doc_bp
+from routes.document_management import document_management_bp
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///test.db'
 db.init_app(app)
 
-app.register_blueprint(doc_bp)
+app.register_blueprint(document_management_bp)
 
 # PAGES
 @app.route('/')

@@ -3,9 +3,9 @@ from datetime import datetime, timezone
 from models.db import db
 from models.document import Document
 
-doc_bp = Blueprint('doc_bp', __name__, template_folder='../templates', static_folder='../static')
+document_management_bp = Blueprint('document_management_bp', __name__, template_folder='../templates', static_folder='../static')
 
-@doc_bp.route('/documents', methods=['POST', 'GET'])
+@document_management_bp.route('/documents', methods=['POST', 'GET'])
 def documents():
     if request.method == 'POST':
         file_name = request.form.get('name')
@@ -24,14 +24,14 @@ def documents():
         try:
             db.session.add(new_document)
             db.session.commit()
-            return redirect(url_for('doc_bp.documents'))
+            return redirect(url_for('document_management_bp.documents'))
         except Exception as e:
             return f'There was an issue adding your document: {e}', 500
     else:
         documents = Document.query.order_by(Document.date_uploaded.desc()).all()
         return render_template('documents.html', documents=documents)
 
-@doc_bp.route('/documents/edit/<int:id>', methods=['POST'])
+@document_management_bp.route('/documents/edit/<int:id>', methods=['POST'])
 def edit_document(id):
     doc_to_edit = Document.query.get_or_404(id)
     data = request.get_json()
@@ -49,7 +49,7 @@ def edit_document(id):
         db.session.rollback()
         return f'There was an issue updating the document: {e}', 500
 
-@doc_bp.route('/documents/delete/<int:id>', methods=['DELETE'])
+@document_management_bp.route('/documents/delete/<int:id>', methods=['DELETE'])
 def delete_document(id):
     doc_to_delete = Document.query.get_or_404(id)
     try:
