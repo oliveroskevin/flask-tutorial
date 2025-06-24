@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Chat ADAM | Smarthub</title>
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/chatbot.css') }}" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+    </head>
+    <body>
+        <header class="chatbot-header">
+            <div class="logo-nav">
+                <!-- <img
+                    src="https://uploads-ssl.webflow.com/63e4e2e7e7b1e2b1e6e7e7e7/63e4e2e7e7b1e2b1e6e7e7e8_logo.svg"
+                    alt="Smarthub Logo"
+                    class="logo"
+                /> -->
+                <nav>
+                    <a href="#" class="active">Home</a>
+                    <a href="#" class="active">Chat ADAM</a>
+                    <a href="#">Articles</a>
+                </nav>
+            </div>
+            <div class="user-avatar">K</div>
+        </header>
+        <main class="chatbot-main">
+            <section class="chatbot-welcome">
+                <div class="chatbot-icon"><i class="fa-solid fa-circle-arrow-up"></i></div>
+                <div>
+                    <h1>Hi, I'm ADAM <span>👋</span></h1>
+                    <p>Your personal Emapta guide</p>
+                </div>
+            </section>
+            <section class="chatbot-messages">
+                <div class="message bot">
+                    <div class="bot-icon"><i class="fa-solid fa-circle-arrow-up"></i></div>
+                    <div class="bubble">Hi choom how can I help you today?</div>
+                </div>
+            </section>
+            <form class="chatbot-input-bar">
+                <input type="text" placeholder="Ask me anything" autocomplete="off" />
+                <button type="submit"><i class="fa-solid fa-paper-plane"></i></button>
+            </form>
+            <div class="chatbot-footer">ADAM can make mistakes. Verify important information.</div>
+        </main>
+    </body>
+</html>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const form = document.querySelector('.chatbot-input-bar');
+        const input = form.querySelector('input[type="text"]');
+        const messagesContainer = document.querySelector('.chatbot-messages');
+
+        function appendMessage(content, sender = 'user') {
+            const msgDiv = document.createElement('div');
+            msgDiv.className = 'message ' + sender;
+            if (sender === 'bot') {
+                msgDiv.innerHTML = `
+                    <div class="bot-icon"><i class="fa-solid fa-circle-arrow-up"></i></div>
+                    <div class="bubble">${content}</div>
+                `;
+            } else {
+                msgDiv.innerHTML = `<div class="bubble">${content}</div>`;
+            }
+            messagesContainer.appendChild(msgDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            return msgDiv; // Return the message element for reference
+        }
+
+        function removeLoadingIndicator() {
+            // Find and remove the loading indicator specifically
+            const messages = messagesContainer.querySelectorAll('.message.bot');
+            for (let i = messages.length - 1; i >= 0; i--) {
+                const bubble = messages[i].querySelector('.bubble');
+                if (bubble && bubble.textContent === '...') {
+                    messages[i].remove();
+                    break; // Only remove the first loading indicator found
+                }
+            }
+        }
+
+        form.addEventListener('submit', async function (e) {
+            e.preventDefault();
+            const userMsg = input.value.trim();
+            if (!userMsg) return;
+
+            appendMessage(userMsg, 'user');
+            input.value = '';
+            appendMessage('...', 'bot'); // Loading indicator
+
+            try {
+                const res = await fetch('/aws-bedrock', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: userMsg }),
+                });
+                const data = await res.json();
+
+                // Remove loading indicator
+                removeLoadingIndicator();
+
+                // Add the actual response
+                appendMessage(data.response, 'bot');
+            } catch (err) {
+                console.error('Error:', err);
+
+                // Remove loading indicator
+                removeLoadingIndicator();
+
+                // Add error message
+                appendMessage('Sorry, there was an error. Please try again.', 'bot');
+            }
+        });
+    });
+</script>

@@ -1,0 +1,202 @@
+body,
+html {
+    margin: 0;
+    padding: 0;
+    font-family: 'Inter', Arial, sans-serif;
+    background: #f6f8fb;
+    height: 100%;
+}
+
+.chatbot-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 2rem 3rem 1.5rem 3rem;
+    background: #fff;
+    border-bottom: 1px solid #e5eaf1;
+}
+.logo-nav {
+    display: flex;
+    align-items: center;
+    gap: 2.5rem;
+}
+.logo {
+    height: 36px;
+    margin-right: 2rem;
+}
+nav {
+    display: flex;
+    gap: 2rem;
+}
+nav a {
+    color: #7a7a7a;
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 1.05rem;
+    padding-bottom: 2px;
+    border-bottom: 2px solid transparent;
+    transition: color 0.2s, border-bottom 0.2s;
+}
+nav a.active {
+    color: #1a6cff;
+    border-bottom: 2px solid #1a6cff;
+}
+.user-avatar {
+    background: #e0e7ff;
+    color: #1a6cff;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 1.2rem;
+}
+
+.chatbot-main {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 2rem;
+    min-height: 90vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.chatbot-welcome {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    margin: 2.5rem 0 1.5rem 0;
+}
+.chatbot-icon {
+    background: linear-gradient(135deg, #1a6cff 60%, #7f5fff 100%);
+    color: #fff;
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.2rem;
+}
+.chatbot-welcome h1 {
+    font-size: 2rem;
+    font-weight: 600;
+    margin: 0 0 0.3rem 0;
+    color: #222;
+}
+.chatbot-welcome p {
+    color: #7a7a7a;
+    font-size: 1.1rem;
+    margin: 0;
+}
+
+.chatbot-messages {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+    margin-bottom: 2.5rem;
+}
+.message {
+    display: flex;
+    align-items: flex-end;
+    gap: 1rem;
+}
+.message.bot {
+    align-items: flex-start;
+}
+.bot-icon {
+    background: linear-gradient(135deg, #1a6cff 60%, #7f5fff 100%);
+    color: #fff;
+    border-radius: 50%;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    margin-top: 2px;
+}
+.bubble {
+    background: #fff;
+    border-radius: 16px;
+    padding: 1.1rem 1.4rem;
+    font-size: 1.08rem;
+    color: #222;
+    box-shadow: 0 2px 8px 0 rgba(30, 42, 80, 0.07);
+    max-width: 600px;
+    line-height: 1.6;
+}
+.message.user {
+    flex-direction: row-reverse;
+}
+.message.user .bubble {
+    background: #1a6cff;
+    color: #fff;
+    border-bottom-right-radius: 6px;
+    border-bottom-left-radius: 16px;
+    border-top-left-radius: 16px;
+    border-top-right-radius: 16px;
+}
+
+.chatbot-input-bar {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px 0 rgba(30, 42, 80, 0.07);
+    padding: 0.5rem 1.2rem;
+    margin-bottom: 1.2rem;
+}
+.chatbot-input-bar input[type='text'] {
+    flex: 1;
+    border: none;
+    outline: none;
+    font-size: 1.1rem;
+    padding: 0.9rem 0.7rem;
+    background: transparent;
+}
+.chatbot-input-bar button {
+    background: #1a6cff;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 0.7rem 1.2rem;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+.chatbot-input-bar button:hover {
+    background: #174fcf;
+}
+
+.chatbot-footer {
+    text-align: center;
+    color: #b0b0b0;
+    font-size: 0.98rem;
+    margin-bottom: 1.5rem;
+}
+
+@media (max-width: 700px) {
+    .chatbot-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+        padding: 1.2rem 1rem 1rem 1rem;
+    }
+    .chatbot-main {
+        padding: 0 0.5rem;
+    }
+    .chatbot-welcome {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.7rem;
+    }
+    .bubble {
+        max-width: 95vw;
+        font-size: 1rem;
+    }
+}
