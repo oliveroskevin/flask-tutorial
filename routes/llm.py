@@ -23,10 +23,12 @@ def aws_bedrock():
                 region_name=os.getenv('AWS_REGION'),
                 client=bedrock_client,
         )
+
         messages = [
-            ("system", "You are a helpful assistant. Act like Rebecca from Cyberpunk 2077: Edgerunners."),
+            ("system", request_data.get("system_prompt")),
             ("human", request_data.get("message"))
         ]
+        print(messages)
         response = llm.invoke(messages)
         return {
             "response": response.content

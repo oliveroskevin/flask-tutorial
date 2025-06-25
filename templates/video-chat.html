@@ -26,7 +26,7 @@
                     <div class="main-video">
                         <div class="video-stream">
                             <img
-                                src="{{ url_for('static', filename='images/1.jpeg') }}"
+                                src="{{ url_for('static', filename='images/3.gif') }}"
                                 alt="Main Video Stream"
                                 class="video-image"
                             />
@@ -45,7 +45,7 @@
                     <div class="participant-video">
                         <div class="video-stream small">
                             <img
-                                src="{{ url_for('static', filename='images/jisoo.jpeg') }}"
+                                src="{{ url_for('static', filename='images/jisoo.gif') }}"
                                 alt="Jisoo"
                                 class="video-image"
                             />
@@ -55,7 +55,7 @@
                     <div class="participant-video">
                         <div class="video-stream small">
                             <img
-                                src="{{ url_for('static', filename='images/Yeji.jpg') }}"
+                                src="{{ url_for('static', filename='images/Yeji.gif') }}"
                                 alt="Yeji"
                                 class="video-image"
                             />
@@ -65,7 +65,7 @@
                     <div class="participant-video">
                         <div class="video-stream small">
                             <img
-                                src="{{ url_for('static', filename='images/yunjin.png') }}"
+                                src="{{ url_for('static', filename='images/yunjin.gif') }}"
                                 alt="Yunjin"
                                 class="video-image"
                             />
@@ -75,12 +75,22 @@
                     <div class="participant-video">
                         <div class="video-stream small">
                             <img
-                                src="{{ url_for('static', filename='images/nayeon.jpg') }}"
+                                src="{{ url_for('static', filename='images/nayeon.gif') }}"
                                 alt="Nayeon"
                                 class="video-image"
                             />
                         </div>
                         <div class="participant-name">Nayeon - Twice</div>
+                    </div>
+                    <div class="participant-video">
+                        <div class="video-stream small">
+                            <img
+                                src="{{ url_for('static', filename='images/yeri.gif') }}"
+                                alt="Yeri"
+                                class="video-image"
+                            />
+                        </div>
+                        <div class="participant-name">Yeri - Red Velvet</div>
                     </div>
                 </div>
 
@@ -109,12 +119,12 @@
                         <div class="bot-icon"><i class="fa-solid fa-circle-arrow-up"></i></div>
                         <div class="bubble">Annyeonghaseyo! Welcome everyone! I'm Karina from Aespa.</div>
                     </div>
-                    <div class="message user">
+                    <!-- <div class="message user">
                         <div class="bubble">Annyeonghaseyo! 👋</div>
                     </div>
                     <div class="message user">
                         <div class="bubble">Can everyone hear me clearly?</div>
-                    </div>
+                    </div> -->
                 </div>
 
                 <form class="chat-input-bar">
@@ -172,7 +182,11 @@
                 const res = await fetch('/aws-bedrock', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ message: userMsg }),
+                    body: JSON.stringify({
+                        message: userMsg,
+                        system_prompt:
+                            'You are a helpful assistant. Act like Karina from Aespa. In this situation, Karina is an interviewee looking for work',
+                    }),
                 });
                 const data = await res.json();
 
