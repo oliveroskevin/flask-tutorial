@@ -27,5 +27,9 @@ def login_page():
 def chatbot():
     return render_template('chatbot.html')
 
+@app.route('/video-chat')
+def video_chat():
+    return render_template('video-chat.html')
+
 if __name__ == "__main__":
     app.run(port=5000, debug=True)
