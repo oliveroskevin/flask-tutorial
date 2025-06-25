@@ -24,7 +24,7 @@ def aws_bedrock():
                 client=bedrock_client,
         )
         messages = [
-            ("system", "You are a helpful assistant."),
+            ("system", "You are a helpful assistant. Act like Rebecca from Cyberpunk 2077: Edgerunners."),
             ("human", request_data.get("message"))
         ]
         response = llm.invoke(messages)
